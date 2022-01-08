@@ -1,25 +1,26 @@
 package main
+
 import (
 	"log"
 	"time"
+
 	"github.com/joho/godotenv"
-	"github.com/davecgh/go-spew/spew"
 	. "github.com/augcos/GoBlockchain/blockchain"
 )
 
 
 func main() {
+	// loads the enviroment variables (.env file)
 	err := godotenv.Load()
 	if err != nil {
-		log.Fatal(err)
+		log.Fatal("Error loading the .env file")
 	}
 
+	// runs the blockchain and the server
 	go func() {
-		t := time.Now()
-		genesisBlock := Block{0, t.String(), []byte("test"), "", ""}
-		spew.Dump(genesisBlock)
-		Blockchain = append(Blockchain, &genesisBlock)
+		genesisBlock := Block{0, time.Now().String(), "test", "", ""}
+		genesisBlock.Hash = CalculateHash(genesisBlock)
+		Blockchain = append(Blockchain, genesisBlock)
 	}()
 	log.Fatal(Run())
-
 }

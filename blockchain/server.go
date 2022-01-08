@@ -9,37 +9,37 @@ import (
 	"encoding/json"
 
 	"github.com/gorilla/mux"
-	"github.com/davecgh/go-spew/spew"
 )
 
 
+// Run() starts the blockchain server
 func Run() error {
-	mux := MakeMuxRouter()
+	mux := MuxHandler()
 	httpAddr := os.Getenv("PORT")
 	log.Println("Listening on ", httpAddr)
-	s := &http.Server{
+	server := &http.Server {
 		Addr:           ":" + httpAddr,
 		Handler:        mux,
 		ReadTimeout:    10 * time.Second,
 		WriteTimeout:   10 * time.Second,
 		MaxHeaderBytes: 1 << 20,
 	}
-
-	if err := s.ListenAndServe(); err != nil {
+	if err := server.ListenAndServe(); err != nil {
 		return err
 	}
-
 	return nil
 }
 
-func MakeMuxRouter() http.Handler {
+// MakeMuxRouter() returns the http mux with the appropiate functions
+func MuxHandler() http.Handler {
 	muxRouter := mux.NewRouter()
-	muxRouter.HandleFunc("/", HandleGetBlockchain).Methods("GET")
-	muxRouter.HandleFunc("/", HandleWriteBlockchain).Methods("POST")
+	muxRouter.HandleFunc("/", GetBlockchain).Methods("GET")
+	muxRouter.HandleFunc("/", PostBlockchain).Methods("POST")
 	return muxRouter
 }
 
-func HandleGetBlockchain(w http.ResponseWriter, r *http.Request) {
+// GetBlockchain() is the answer for the GET request
+func GetBlockchain(w http.ResponseWriter, r *http.Request) {
 	bytes, err := json.MarshalIndent(Blockchain, "", "  ")
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -48,39 +48,33 @@ func HandleGetBlockchain(w http.ResponseWriter, r *http.Request) {
 	io.WriteString(w, string(bytes))
 }
 
-func HandleWriteBlockchain(w http.ResponseWriter, r *http.Request) {
-	log.Println(w,r)
+// GetBlockchain() is the answer for the GET request
+type PostMessage struct {
+	Data string
 }
 
-type Message struct {
-	Data []byte
-}
-
-func handleWriteBlock(w http.ResponseWriter, r *http.Request) {
-	var m Message
-
+// PostBlockchain() is the answer for the POST request
+func PostBlockchain(w http.ResponseWriter, r *http.Request) {
+	var msg PostMessage
 	decoder := json.NewDecoder(r.Body)
-	if err := decoder.Decode(&m); err != nil {
-		respondWithJSON(w, r, http.StatusBadRequest, r.Body)
+	if err := decoder.Decode(&msg); err != nil {
+		jsonRespond(w, r, http.StatusBadRequest, r.Body)
 		return
 	}
-	defer r.Body.Close()
-
-	newBlock, err := GenerateBlock(Blockchain[len(Blockchain)-1], m.Data)
+	newBlock, err := GenerateBlock(Blockchain[len(Blockchain)-1], msg.Data)
 	if err != nil {
-		respondWithJSON(w, r, http.StatusInternalServerError, m)
+		jsonRespond(w, r, http.StatusInternalServerError, msg)
 		return
 	}
-	if IsBlockValid(newBlock, Blockchain[len(Blockchain)-1]) {
+	if IsBlockValid(Blockchain[len(Blockchain)-1],newBlock) {
 		newBlockchain := append(Blockchain, newBlock)
 		ReplaceChain(newBlockchain)
-		spew.Dump(Blockchain)
 	}
-
-	respondWithJSON(w, r, http.StatusCreated, newBlock)
-
+	jsonRespond(w, r, http.StatusCreated, newBlock)
 }
-func respondWithJSON(w http.ResponseWriter, r *http.Request, code int, payload interface{}) {
+
+// respondWithJSON() is the answer for the POST request
+func jsonRespond(w http.ResponseWriter, r *http.Request, code int, payload interface{}) {
 	response, err := json.MarshalIndent(payload, "", "  ")
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)

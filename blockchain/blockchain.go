@@ -6,18 +6,19 @@ import (
 	"encoding/hex"
 )
 
-var Blockchain []*Block
+// var Blockchain contains the blockchain data
+var Blockchain []Block
 type Block struct {
 	BlockNumber int
 	BlockTime 	string
-	Data		[]byte
+	Data		string
 	Hash		string
 	PrevHash	string
-
 }
 
-func CalculateHash(block *Block) string{
-	record := string(block.BlockNumber) + block.BlockTime + block.PrevHash
+// CalculateHash() returns the hash of a given block
+func CalculateHash(block Block) string{
+	record := string(block.BlockNumber) + block.PrevHash
 	h := sha256.New()
 	h.Write([]byte(record))
 	hashed := h.Sum(nil)
@@ -25,20 +26,22 @@ func CalculateHash(block *Block) string{
 	return hash
 }
 
-func GenerateBlock(prevBlock *Block, data []byte) (*Block, error) {
-	var nextBlock *Block
+// GenerateBlock() returns a pointer to a newly create block
+func GenerateBlock(prevBlock Block, data string) (Block, error) {
+	var nextBlock Block
 	t := time.Now()
 
 	nextBlock.BlockNumber = prevBlock.BlockNumber + 1
 	nextBlock.BlockTime = t.String()
 	nextBlock.Data = data
-	nextBlock.Hash = CalculateHash(nextBlock)
 	nextBlock.PrevHash = prevBlock.Hash
+	nextBlock.Hash = CalculateHash(nextBlock)
 
 	return nextBlock, nil
 }
 
-func IsBlockValid(prevBlock, nextBlock *Block) bool {
+// IsBlockValid() checks if a block's BlockNumber, PrevHash and Hash are correct
+func IsBlockValid(prevBlock, nextBlock Block) bool {
 	if prevBlock.BlockNumber+1 != nextBlock.BlockNumber {
 		return false
 	}
@@ -51,7 +54,18 @@ func IsBlockValid(prevBlock, nextBlock *Block) bool {
 	return true
 }
 
-func ReplaceChain(newBlockchain []*Block) {
+// IsBlockValid() checks if all blocks in a blockchain are valid
+func IsBlockchainValid(testedChain []Block) bool {
+	for i:=1; i<(len(testedChain)-1); i++ {
+		if !IsBlockValid(testedChain[i-1],testedChain[i]) {
+			return false
+		}
+	}
+	return true
+}
+
+// ReplaceChain() replaces the blockchain if it is given a longer alternative
+func ReplaceChain(newBlockchain []Block) {
 	if len(newBlockchain) > len(Blockchain) {
 		Blockchain = newBlockchain
 	}
