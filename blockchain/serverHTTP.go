@@ -12,11 +12,11 @@ import (
 )
 
 
-// Run() starts the blockchain server
-func Run() error {
+// Run() starts the HTTP server
+func RunHttp() error {
 	mux := MuxHandler()
 	httpAddr := os.Getenv("PORT")
-	log.Println("Listening on ", httpAddr)
+	log.Println("Listening on", httpAddr)
 	server := &http.Server {
 		Addr:           ":" + httpAddr,
 		Handler:        mux,

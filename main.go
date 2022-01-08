@@ -9,6 +9,7 @@ import (
 )
 
 
+
 func main() {
 	// loads the enviroment variables (.env file)
 	err := godotenv.Load()
@@ -16,11 +17,14 @@ func main() {
 		log.Fatal("Error loading the .env file")
 	}
 
-	// runs the blockchain and the server
+
+
+	// creates the genesis block and starts the blockchain
 	go func() {
 		genesisBlock := Block{0, time.Now().String(), "test", "", ""}
 		genesisBlock.Hash = CalculateHash(genesisBlock)
 		Blockchain = append(Blockchain, genesisBlock)
 	}()
-	log.Fatal(Run())
+	// runs the server
+	log.Fatal(RunTcp())
 }
