@@ -5,7 +5,7 @@ import (
 	"time"
 
 	"github.com/joho/godotenv"
-	. "github.com/augcos/GoBlockchain/blockchain"
+	. "github.com/augcos/GoBlockchainPoW/blockchainPoW"
 )
 
 
@@ -18,12 +18,15 @@ func main() {
 	}
 
 
-
 	// creates the genesis block and starts the blockchain
 	go func() {
-		genesisBlock := Block{0, time.Now().String(), "test", "", ""}
+		var genesisBlock Block
+		genesisBlock = Block{0, time.Now().String(), "genesis", "", "", Difficulty, ""}
 		genesisBlock.Hash = CalculateHash(genesisBlock)
+
+		Mutex.Lock()
 		Blockchain = append(Blockchain, genesisBlock)
+		Mutex.Unlock()
 	}()
 	// runs the server
 	log.Fatal(RunTcp())

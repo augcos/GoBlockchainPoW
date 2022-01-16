@@ -1,16 +1,18 @@
-package blockchain
+package blockchainPoW
 
 import (
 	"os"
 	"io"
 	"log"
 	"time"
+	"sync"
 	"net/http"
 	"encoding/json"
 
 	"github.com/gorilla/mux"
 )
 
+var Mutex = &sync.Mutex{}
 
 // Run() starts the HTTP server
 func RunHttp() error {
@@ -61,7 +63,10 @@ func PostBlockchain(w http.ResponseWriter, r *http.Request) {
 		jsonRespond(w, r, http.StatusBadRequest, r.Body)
 		return
 	}
+	Mutex.Lock()
 	newBlock, err := GenerateBlock(Blockchain[len(Blockchain)-1], msg.Data)
+	Mutex.Unlock()
+
 	if err != nil {
 		jsonRespond(w, r, http.StatusInternalServerError, msg)
 		return

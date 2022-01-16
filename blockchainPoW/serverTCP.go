@@ -1,4 +1,4 @@
-package blockchain
+package blockchainPoW
 
 import (
 	"os"
@@ -36,7 +36,9 @@ func RunTcp() error {
 // handleConn() starts the TCP server
 func handleConn(conn net.Conn) {
 	defer conn.Close()
-	io.WriteString(conn, "Enter a new string:")
+
+	// go routine to scan for strings to create new blocks
+	io.WriteString(conn, "Enter a new string: ")
 	scanner := bufio.NewScanner(conn)
 	go func() {
 		for scanner.Scan() {
@@ -50,10 +52,11 @@ func handleConn(conn net.Conn) {
 				ReplaceChain(newBlockchain)
 			}
 			bcServer<-Blockchain
-			io.WriteString(conn, "\nEnter a new string:")
+			io.WriteString(conn, "\nEnter a new string: ")
 		}
 	}()
 
+	// go routine to broadcast the blockchain
 	go func() {
 		for {
 			time.Sleep(30*time.Second)
@@ -65,6 +68,7 @@ func handleConn(conn net.Conn) {
 		}
 	}()
 	
+	// go routine to print the blockchain on the terminal
 	for _ = range bcServer {
 		spew.Dump(Blockchain)
 	}

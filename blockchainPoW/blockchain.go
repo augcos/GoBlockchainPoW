@@ -1,10 +1,14 @@
-package blockchain
+package blockchainPoW
 
 import (
+	"fmt"
+	"strings"
 	"time"
 	"crypto/sha256"
 	"encoding/hex"
 )
+
+const Difficulty = 3
 
 // var Blockchain contains the blockchain data
 var Blockchain []Block
@@ -14,11 +18,13 @@ type Block struct {
 	Data		string
 	Hash		string
 	PrevHash	string
+	Difficulty  int
+	Nonce 		string
 }
 
 // CalculateHash() returns the hash of a given block
 func CalculateHash(block Block) string{
-	record := string(block.BlockNumber) + block.PrevHash
+	record := string(block.BlockNumber) + block.PrevHash + block.Nonce
 	h := sha256.New()
 	h.Write([]byte(record))
 	hashed := h.Sum(nil)
@@ -35,8 +41,20 @@ func GenerateBlock(prevBlock Block, data string) (Block, error) {
 	nextBlock.BlockTime = t.String()
 	nextBlock.Data = data
 	nextBlock.PrevHash = prevBlock.Hash
-	nextBlock.Hash = CalculateHash(nextBlock)
+	nextBlock.Difficulty = Difficulty
 
+	for i:=0;; i++ {
+		hex := fmt.Sprintf("%x",i)
+		nextBlock.Nonce = hex
+		if !IsHashValid(CalculateHash(nextBlock), nextBlock.Difficulty) {
+			fmt.Println(CalculateHash(nextBlock), "do more work!")
+			continue
+		} else {
+			fmt.Println(CalculateHash(nextBlock), "work done!")
+			nextBlock.Hash = CalculateHash(nextBlock)
+			break
+		}
+	}
 	return nextBlock, nil
 }
 
@@ -65,8 +83,14 @@ func IsBlockchainValid(testedChain []Block) bool {
 }
 
 // ReplaceChain() replaces the blockchain if it is given a longer alternative
-func ReplaceChain(newBlockchain []Block) {
-	if len(newBlockchain) > len(Blockchain) {
-		Blockchain = newBlockchain
+func ReplaceChain(nextBlockchain []Block) {
+	if len(nextBlockchain) > len(Blockchain) {
+		Blockchain = nextBlockchain
 	}
+}
+
+// IsHashValid() checks if hash is right difficulty
+func IsHashValid(hash string, difficulty int) bool {
+	prefix := strings.Repeat("0", difficulty)
+	return strings.HasPrefix(hash, prefix)
 }

@@ -1,4 +1,4 @@
-module github.com/augcos/GoBlockchain
+module github.com/augcos/GoBlockchainPoW
 
 go 1.17
 
