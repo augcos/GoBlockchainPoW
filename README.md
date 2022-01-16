@@ -1,6 +1,6 @@
 # GoBlockchainPoW
 ## Introduction
-This project is my personal Go implementation of a proof-of-work blockchain proposed by [Coral Health](https://github.com/nosequeldeebee/blockchain-tutorial). This project was developed using Go v1.17.5 for Linux systems.
+This project is my personal Go implementation of a proof-of-work blockchain proposed by [Coral Health](https://github.com/nosequeldeebee/blockchain-tutorial). If you want to see the proof-of-stake version of this blockchain, click [here](https://github.com/augcos/GoBlockchainPoS). This project was developed using Go v1.17.5 for Linux systems.
 
 ## How to install?
 First, you will have to make sure to have preinstalled the required third-party packages. You can install them using the following commands:
