@@ -17,7 +17,6 @@ func main() {
 		log.Fatal("Error loading the .env file")
 	}
 
-
 	// creates the genesis block and starts the blockchain
 	go func() {
 		var genesisBlock Block
@@ -28,6 +27,7 @@ func main() {
 		Blockchain = append(Blockchain, genesisBlock)
 		Mutex.Unlock()
 	}()
+
 	// runs the server
 	log.Fatal(RunTcp())
 }
