@@ -8,7 +8,7 @@ import (
 	"encoding/hex"
 )
 
-const Difficulty = 3
+const Difficulty = os.Getenv("DIFFICULTY")
 
 // var Blockchain contains the blockchain data
 var Blockchain []Block
