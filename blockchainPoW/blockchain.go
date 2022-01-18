@@ -8,9 +8,10 @@ import (
 	"encoding/hex"
 )
 
-const Difficulty = os.Getenv("DIFFICULTY")
+// mining difficulty (number of zeros that the hash must have)
+const Difficulty = 3
 
-// var Blockchain contains the blockchain data
+// var Blockchain contains the multiple Blocks
 var Blockchain []Block
 type Block struct {
 	BlockNumber int
@@ -22,7 +23,8 @@ type Block struct {
 	Nonce 		string
 }
 
-// CalculateHash() returns the hash of a given block
+// CalculateHash() returns the hash of a given block. It gets the block number, the
+// previous hash and the nonce and calculates the sha256 hash in string form
 func CalculateHash(block Block) string{
 	record := string(block.BlockNumber) + block.PrevHash + block.Nonce
 	h := sha256.New()
@@ -32,7 +34,7 @@ func CalculateHash(block Block) string{
 	return hash
 }
 
-// GenerateBlock() returns a pointer to a newly create block
+// GenerateBlock() creates a new block given the previous block and a string
 func GenerateBlock(prevBlock Block, data string) (Block, error) {
 	var nextBlock Block
 	t := time.Now()
@@ -43,6 +45,7 @@ func GenerateBlock(prevBlock Block, data string) (Block, error) {
 	nextBlock.PrevHash = prevBlock.Hash
 	nextBlock.Difficulty = Difficulty
 
+	// The nonce is tried over and over until it matches the network difficulty
 	for i:=0;; i++ {
 		hex := fmt.Sprintf("%x",i)
 		nextBlock.Nonce = hex
@@ -72,7 +75,7 @@ func IsBlockValid(prevBlock, nextBlock Block) bool {
 	return true
 }
 
-// IsBlockValid() checks if all blocks in a blockchain are valid
+// IsBlockchainValid() checks if all blocks in a blockchain are valid
 func IsBlockchainValid(testedChain []Block) bool {
 	for i:=1; i<(len(testedChain)-1); i++ {
 		if !IsBlockValid(testedChain[i-1],testedChain[i]) {

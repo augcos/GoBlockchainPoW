@@ -16,13 +16,18 @@ var bcServer chan []Block
 
 // RunTcp() starts the TCP server
 func RunTcp() error {
+	// initializes the server and the blockchain channel (bcServer)
 	bcServer = make(chan []Block)
 	server, err := net.Listen("tcp", ":" + os.Getenv("PORT"))
 	log.Println("Listening on", os.Getenv("PORT"))
 	if err != nil {
 		return err
 	}
+
+	// closes the server after exiting the function
 	defer server.Close()
+
+	// accepts and start a go routine for each new connection
 	for {
 		conn, err := server.Accept()
 		if err != nil {
@@ -33,8 +38,10 @@ func RunTcp() error {
 	return nil
 }
 
-// handleConn() starts the TCP server
+
+// handleConn() handles any new connection
 func handleConn(conn net.Conn) {
+	// closes the connection after exiting the function
 	defer conn.Close()
 
 	// go routine to scan for strings to create new blocks
@@ -56,7 +63,7 @@ func handleConn(conn net.Conn) {
 		}
 	}()
 
-	// go routine to broadcast the blockchain
+	// go routine to broadcast the blockchain to the connected user
 	go func() {
 		for {
 			time.Sleep(30*time.Second)
