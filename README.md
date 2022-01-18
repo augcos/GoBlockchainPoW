@@ -16,9 +16,9 @@ git clone github.com/augcos/GoBlockchainPoW
 
 ## How to run?
 ### Using a TCP connection
-By default, GoBlockchainPoW will run using a TCP server. In order to launch both the server and the blockchain, run the blockchain.go file:
+By default, GoBlockchainPoW will run using a TCP server. In order to launch both the server and the blockchain, run the main.go file:
 ```
-go run blockchain.go
+go run main.go
 ```
 Then, open a different terminal and connect to the TCP server:
 ```
@@ -29,7 +29,7 @@ You will be prompted to input a string as data for a new block. Once a new block
 ### Using a HTTP conection
 In order to run the blockchain using a HTTP server, you will need to change the log.Fatal(runTcp()) line at the end of the blockchain.go file to log.Fatal(runHttp()). Then, launch the server and the blockchain using the command:
 ```
-go run blockchain.go
+go run main.go
 ```
 In order to propose a new block, you will need to do a POST request to localhost:8080 with the following structure:
 ```
