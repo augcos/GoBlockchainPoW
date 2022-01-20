@@ -5,7 +5,7 @@ This project is my personal Go implementation of a proof-of-work blockchain prop
 ## How to install?
 First, you will have to make sure to have preinstalled the required third-party packages. You can install them using the following commands:
 ```
-github.com/joho/godotenv
+go get github.com/joho/godotenv
 go get github.com/gorilla/mux
 go get github.com/davecgh/go-spew/spew
 ```
@@ -27,7 +27,7 @@ nc localhost 8080
 You will be prompted to input a string as data for a new block. Once a new block has been proposed, you will see the mining process in the first terminal until a nonce appropiate to the difficulty is found and the block is attached to the blockchain. 
 
 ### Using a HTTP conection
-In order to run the blockchain using a HTTP server, you will need to change the log.Fatal(runTcp()) line at the end of the blockchain.go file to log.Fatal(runHttp()). Then, launch the server and the blockchain using the command:
+In order to run the blockchain using a HTTP server, you will need to change the log.Fatal(runTcp()) line at the end of the main.go file to log.Fatal(runHttp()). Then, launch the server and the blockchain using the command:
 ```
 go run main.go
 ```
