@@ -12,6 +12,7 @@ import (
 	"github.com/davecgh/go-spew/spew"
 )
 
+// var bcServer is the channel for the blockchain
 var bcServer chan []Block
 
 // RunTcp() starts the TCP server
